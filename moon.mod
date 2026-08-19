@@ -9,14 +9,12 @@ repository = ""
 
 license = "Apache-2.0"
 
-keywords = [
-  "marc21",
-  "iso2709",
-  "bibliographic",
-  "library-science",
-  "parser",
-]
+keywords = [ "marc21", "iso2709", "bibliographic", "library-science", "parser" ]
 
 preferred_target = "wasm-gc"
 
 description = "Pure MoonBit toolkit for parsing, validating, and transforming MARC 21 / ISO 2709 bibliographic records"
+
+import {
+  "moonbitlang/x@0.4.50",
+}

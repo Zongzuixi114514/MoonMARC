@@ -1,0 +1,64 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "Zongzuixi114514/moonmarc/record"
+
+import {
+  "Zongzuixi114514/moonmarc/directory",
+  "Zongzuixi114514/moonmarc/leader",
+  "moonbitlang/core/debug",
+}
+
+// Values
+
+// Errors
+pub(all) suberror RecordError {
+  Leader(@leader.LeaderError)
+  Directory(@directory.DirectoryError)
+  InvalidLength(Int, Int)
+  FieldOutsideRecord(String)
+  FieldTerminatorMissing(String)
+  InvalidControlField(String)
+  InvalidDataField(String)
+  InvalidUtf8(String)
+  InvalidSubfield(String)
+} derive(Eq, @debug.Debug)
+pub fn RecordError::to_string(Self) -> String
+pub impl Show for RecordError
+
+// Types and methods
+pub(all) enum MarcField {
+  ControlField(tag~ : String, value~ : String)
+  DataField(tag~ : String, indicator1~ : Char, indicator2~ : Char, subfields~ : Array[Subfield])
+} derive(Eq, @debug.Debug)
+pub fn MarcField::tag(Self) -> String
+pub fn MarcField::value(Self) -> String
+
+pub(all) struct MarcRecord {
+  leader : @leader.Leader
+  fields : Array[MarcField]
+} derive(Eq, @debug.Debug)
+pub fn MarcRecord::control_number(Self) -> String?
+pub fn MarcRecord::fields(Self) -> Array[MarcField]
+pub fn MarcRecord::fields_by_tag(Self, String) -> Array[MarcField]
+pub fn MarcRecord::first_subfield(Self, String, Char) -> String?
+pub fn MarcRecord::isbn_list(Self) -> Array[String]
+pub fn MarcRecord::languages(Self) -> Array[String]
+pub fn MarcRecord::leader(Self) -> @leader.Leader
+pub fn MarcRecord::other_authors(Self) -> Array[String]
+pub fn MarcRecord::primary_author(Self) -> String?
+pub fn MarcRecord::publication_year(Self) -> String?
+pub fn MarcRecord::publisher(Self) -> String?
+pub fn MarcRecord::subfields(Self, String, Char) -> Array[String]
+pub fn MarcRecord::subjects(Self) -> Array[String]
+pub fn MarcRecord::subtitle(Self) -> String?
+pub fn MarcRecord::summary(Self) -> String?
+pub fn MarcRecord::title(Self) -> String?
+
+pub(all) struct Subfield {
+  code : Char
+  value : String
+} derive(Eq, @debug.Debug)
+
+// Type aliases
+
+// Traits
+

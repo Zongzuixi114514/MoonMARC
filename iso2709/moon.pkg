@@ -1,4 +1,5 @@
 import {
+  "moonbitlang/core/encoding/utf8",
   "Zongzuixi114514/moonmarc/binary",
   "Zongzuixi114514/moonmarc/directory",
   "Zongzuixi114514/moonmarc/leader",

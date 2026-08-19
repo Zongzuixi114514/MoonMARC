@@ -1,9 +1,9 @@
 import {
-  "moonbitlang/core/encoding/utf8" @utf8,
-  "Zongzuixi114514/moonmarc/iso2709",
+  "moonbitlang/core/env",
+  "moonbitlang/core/string",
+  "moonbitlang/x/fs",
   "Zongzuixi114514/moonmarc/record",
+  "Zongzuixi114514/moonmarc/iso2709",
 }
 
-options(
-  "is-main": true,
-)
+pkgtype(kind: "executable")

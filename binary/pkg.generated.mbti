@@ -1,0 +1,46 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "Zongzuixi114514/moonmarc/binary"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn ascii(String) -> Bytes
+
+pub fn concat(Array[Bytes]) -> Bytes
+
+pub fn decode_utf8(Bytes, offset? : Int, length? : Int) -> Result[String, ReadError]
+
+pub fn slice(Bytes, Int, Int) -> Bytes
+
+// Errors
+pub(all) suberror ReadError {
+  InvalidRange(Int, Int)
+  Truncated(Int, Int, Int)
+  InvalidAscii(Int, Int)
+  InvalidDecimal(Int, Int)
+  InvalidUtf8(Int, Int)
+} derive(Eq, @debug.Debug)
+pub fn ReadError::to_string(Self) -> String
+
+// Types and methods
+pub struct Reader {
+  data : Bytes
+  start : Int
+  limit : Int
+  mut position : Int
+}
+pub fn Reader::new(Bytes, start? : Int, limit? : Int) -> Result[Self, ReadError]
+pub fn Reader::position(Self) -> Int
+pub fn Reader::read_ascii(Self, Int) -> Result[String, ReadError]
+pub fn Reader::read_byte(Self) -> Result[Byte, ReadError]
+pub fn Reader::read_bytes(Self, Int) -> Result[Bytes, ReadError]
+pub fn Reader::read_decimal(Self, Int) -> Result[Int, ReadError]
+pub fn Reader::remaining(Self) -> Int
+pub fn Reader::seek(Self, Int) -> Result[Unit, ReadError]
+
+// Type aliases
+
+// Traits
+

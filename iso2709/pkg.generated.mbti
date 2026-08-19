@@ -1,0 +1,20 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "Zongzuixi114514/moonmarc/iso2709"
+
+import {
+  "Zongzuixi114514/moonmarc/record",
+}
+
+// Values
+pub fn parse_record(Bytes) -> Result[@record.MarcRecord, @record.RecordError]
+
+pub fn parse_records(Bytes) -> Array[Result[@record.MarcRecord, @record.RecordError]]
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits
+

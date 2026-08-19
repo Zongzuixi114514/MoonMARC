@@ -82,7 +82,10 @@ pub fn Reader::read_byte(self : Reader) -> Result[Byte, ReadError] {
 }
 
 ///|
-pub fn Reader::read_bytes(self : Reader, length : Int) -> Result[Bytes, ReadError] {
+pub fn Reader::read_bytes(
+  self : Reader,
+  length : Int,
+) -> Result[Bytes, ReadError] {
   if length < 0 {
     return Err(InvalidRange(self.position, self.position + length))
   }
@@ -95,7 +98,10 @@ pub fn Reader::read_bytes(self : Reader, length : Int) -> Result[Bytes, ReadErro
 }
 
 ///|
-pub fn Reader::read_ascii(self : Reader, length : Int) -> Result[String, ReadError] {
+pub fn Reader::read_ascii(
+  self : Reader,
+  length : Int,
+) -> Result[String, ReadError] {
   let start = self.position
   let bytes = match self.read_bytes(length) {
     Err(error) => return Err(error)
@@ -115,7 +121,10 @@ pub fn Reader::read_ascii(self : Reader, length : Int) -> Result[String, ReadErr
 }
 
 ///|
-pub fn Reader::read_decimal(self : Reader, length : Int) -> Result[Int, ReadError] {
+pub fn Reader::read_decimal(
+  self : Reader,
+  length : Int,
+) -> Result[Int, ReadError] {
   let start = self.position
   let bytes = match self.read_bytes(length) {
     Err(error) => return Err(error)
@@ -144,11 +153,7 @@ pub fn decode_utf8(
     return Err(InvalidRange(offset, offset + length))
   }
   let piece = slice(data, offset, offset + length)
-  try {
-    Ok(@utf8.decode(piece[:]))
-  } catch {
+  Ok(@utf8.decode(piece[:])) catch {
     _ => Err(InvalidUtf8(offset, length))
   }
 }
-
-

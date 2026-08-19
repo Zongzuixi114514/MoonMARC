@@ -1,3 +1,4 @@
+///|
 test "bounded reader decodes decimal and ASCII fields" {
   let reader = Reader::new(ascii("00123001"))
   match reader {

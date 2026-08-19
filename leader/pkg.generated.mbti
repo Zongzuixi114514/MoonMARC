@@ -1,0 +1,44 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "Zongzuixi114514/moonmarc/leader"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn parse(Bytes) -> Result[Leader, LeaderError]
+
+// Errors
+pub(all) suberror LeaderError {
+  InvalidLength(Int)
+  NonAscii(Int)
+  InvalidEntryMap(String)
+  InvalidRecordLength(String)
+  InvalidBaseAddress(String)
+} derive(Eq, @debug.Debug)
+pub fn LeaderError::to_string(Self) -> String
+pub impl Show for LeaderError
+
+// Types and methods
+pub struct Leader {
+  raw : String
+} derive(Eq, @debug.Debug)
+pub fn Leader::base_address(Self) -> Result[Int, LeaderError]
+pub fn Leader::bibliographic_level(Self) -> Char
+pub fn Leader::cataloging_form(Self) -> Char
+pub fn Leader::character_coding_scheme(Self) -> Char
+pub fn Leader::encoding_level(Self) -> Char
+pub fn Leader::entry_map(Self) -> Result[(Int, Int, Int), LeaderError]
+pub fn Leader::indicator_count(Self) -> Result[Int, LeaderError]
+pub fn Leader::multipart_level(Self) -> Char
+pub fn Leader::raw(Self) -> String
+pub fn Leader::record_length(Self) -> Result[Int, LeaderError]
+pub fn Leader::record_type(Self) -> Char
+pub fn Leader::status(Self) -> Char
+pub fn Leader::subfield_code_length(Self) -> Result[Int, LeaderError]
+pub fn Leader::type_of_control(Self) -> Char
+
+// Type aliases
+
+// Traits
+

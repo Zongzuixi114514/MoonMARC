@@ -1,4 +1,5 @@
-///| Builders for small byte sequences used by the parser and tests.
+///|
+/// Builders for small byte sequences used by the parser and tests.
 pub fn concat(parts : Array[Bytes]) -> Bytes {
   let mut total = 0
   for part in parts {

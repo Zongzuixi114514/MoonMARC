@@ -1,1 +1,5 @@
-
+import {
+  "Zongzuixi114514/moonmarc/binary",
+  "Zongzuixi114514/moonmarc/directory",
+  "Zongzuixi114514/moonmarc/leader",
+}
