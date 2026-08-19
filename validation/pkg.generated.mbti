@@ -1,0 +1,34 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "Zongzuixi114514/moonmarc/validation"
+
+import {
+  "Zongzuixi114514/moonmarc/record",
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn validate_record(@record.MarcRecord, record_index? : Int) -> Array[Diagnostic]
+
+pub fn validate_unique_control_numbers(Array[@record.MarcRecord]) -> Array[Diagnostic]
+
+// Errors
+
+// Types and methods
+pub(all) struct Diagnostic {
+  severity : Severity
+  code : String
+  message : String
+  record_index : Int
+  tag : String?
+  subfield : Char?
+} derive(Eq, @debug.Debug)
+
+pub(all) enum Severity {
+  Error
+  Warning
+} derive(Eq, @debug.Debug)
+
+// Type aliases
+
+// Traits
+

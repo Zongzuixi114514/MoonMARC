@@ -1,0 +1,34 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "Zongzuixi114514/moonmarc/query"
+
+import {
+  "Zongzuixi114514/moonmarc/record",
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn parse(String) -> Result[Query, QueryError]
+
+pub fn select(@record.MarcRecord, String) -> Result[Array[String], QueryError]
+
+// Errors
+pub(all) suberror QueryError {
+  InvalidLength(Int)
+  InvalidTag(String)
+  MissingSeparator
+  InvalidCode(Char)
+} derive(Eq, @debug.Debug)
+pub fn QueryError::to_string(Self) -> String
+pub impl Show for QueryError
+
+// Types and methods
+pub(all) struct Query {
+  tag : String
+  code : Char
+} derive(Eq, @debug.Debug)
+pub fn Query::evaluate(Self, @record.MarcRecord) -> Array[String]
+
+// Type aliases
+
+// Traits
+

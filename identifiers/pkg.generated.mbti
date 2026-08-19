@@ -1,0 +1,20 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "Zongzuixi114514/moonmarc/identifiers"
+
+// Values
+pub fn is_valid_isbn(String) -> Bool
+
+pub fn is_valid_isbn10(String) -> Bool
+
+pub fn is_valid_isbn13(String) -> Bool
+
+pub fn is_valid_issn(String) -> Bool
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits
+
