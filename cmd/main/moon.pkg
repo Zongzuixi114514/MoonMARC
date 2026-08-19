@@ -2,8 +2,10 @@ import {
   "moonbitlang/core/env",
   "moonbitlang/core/string",
   "moonbitlang/x/fs",
-  "Zongzuixi114514/moonmarc/record",
   "Zongzuixi114514/moonmarc/iso2709",
+  "Zongzuixi114514/moonmarc/query",
+  "Zongzuixi114514/moonmarc/record",
+  "Zongzuixi114514/moonmarc/validation",
 }
 
 pkgtype(kind: "executable")

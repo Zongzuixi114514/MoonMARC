@@ -42,6 +42,25 @@ fn show_record(record : @record.MarcRecord) -> Unit {
 }
 
 ///|
+fn print_diagnostic(diagnostic : @validation.Diagnostic) -> Unit {
+  let severity = match diagnostic.severity {
+    @validation.Severity::Error => "ERROR"
+    @validation.Severity::Warning => "WARNING"
+  }
+  let mut location = " record=" + (diagnostic.record_index + 1).to_string()
+  match diagnostic.tag {
+    Some(tag) => location = location + " field=" + tag
+    None => ()
+  }
+  match diagnostic.subfield {
+    Some(code) => location = location + " subfield=" + code.to_string()
+    None => ()
+  }
+  println(severity + " " + diagnostic.code + location)
+  println("  " + diagnostic.message)
+}
+
+///|
 fn inspect(path : String, validate_only : Bool) -> Unit {
   match read_input(path) {
     None => println("Unable to read file: " + path)
@@ -49,11 +68,32 @@ fn inspect(path : String, validate_only : Bool) -> Unit {
       let results = @iso2709.parse_records(bytes)
       println("Records: " + results.length().to_string())
       let mut valid = 0
-      for result in results {
+      for index, result in results {
         match result {
+          Ok(record) if validate_only => {
+            let diagnostics = @validation.validate_record(
+              record,
+              record_index=index,
+            )
+            let mut has_error = false
+            for diagnostic in diagnostics {
+              print_diagnostic(diagnostic)
+              if diagnostic.severity == @validation.Severity::Error {
+                has_error = true
+              }
+            }
+            if !has_error {
+              valid = valid + 1
+            }
+          }
           Ok(_) => valid = valid + 1
-          Err(error) if validate_only => println("ERROR: " + error.to_string())
-          Err(error) => println("ERROR: " + error.to_string())
+          Err(error) =>
+            println(
+              "ERROR record=" +
+              (index + 1).to_string() +
+              "\n  " +
+              error.to_string(),
+            )
         }
       }
       if validate_only {
@@ -84,16 +124,13 @@ fn show(path : String, index : Int) -> Unit {
 
 ///|
 fn query(path : String, expression : String) -> Unit {
-  let separator = match expression.find("$") {
-    None => -1
-    Some(value) => value
+  let compiled = match @query.parse(expression) {
+    Err(error) => {
+      println("Invalid query: " + error.to_string())
+      return
+    }
+    Ok(value) => value
   }
-  if separator < 0 || separator + 1 >= expression.length() {
-    println("Query must look like TAG$CODE, for example 245$a")
-    return
-  }
-  let tag = expression[:separator].to_owned()
-  let code = expression.get_char(separator + 1).unwrap()
   match read_input(path) {
     None => println("Unable to read file: " + path)
     Some(bytes) => {
@@ -102,9 +139,8 @@ fn query(path : String, expression : String) -> Unit {
         match result {
           Err(error) => println("ERROR: " + error.to_string())
           Ok(record) =>
-            match record.first_subfield(tag, code) {
-              None => ()
-              Some(value) => println(value)
+            for value in compiled.evaluate(record) {
+              println(value)
             }
         }
       }
