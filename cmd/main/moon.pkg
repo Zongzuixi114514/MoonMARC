@@ -1,0 +1,9 @@
+import {
+  "moonbitlang/core/encoding/utf8" @utf8,
+  "Zongzuixi114514/moonmarc/iso2709",
+  "Zongzuixi114514/moonmarc/record",
+}
+
+options(
+  "is-main": true,
+)
