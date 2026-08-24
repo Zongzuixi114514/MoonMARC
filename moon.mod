@@ -5,7 +5,7 @@ version = "0.1.0"
 
 readme = "README.mbt.md"
 
-repository = ""
+repository = "https://github.com/Zongzuixi114514/MoonMARC"
 
 license = "Apache-2.0"
 
