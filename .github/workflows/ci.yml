@@ -10,7 +10,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install MoonBit
-        uses: moonbitlang/setup-moonbit@v1
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+          "$HOME/.moon/bin/moon" version --all
       - name: Check formatting
         run: moon fmt --check
       - name: Check all targets
