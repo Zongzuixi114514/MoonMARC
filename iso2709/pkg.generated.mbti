@@ -3,6 +3,7 @@ package "Zongzuixi114514/moonmarc/iso2709"
 
 import {
   "Zongzuixi114514/moonmarc/record",
+  "moonbitlang/core/debug",
 }
 
 // Values
@@ -10,7 +11,23 @@ pub fn parse_record(Bytes) -> Result[@record.MarcRecord, @record.RecordError]
 
 pub fn parse_records(Bytes) -> Array[Result[@record.MarcRecord, @record.RecordError]]
 
+pub fn serialize_record(@record.MarcRecord) -> Result[Bytes, SerializeError]
+
+pub fn serialize_records(Array[@record.MarcRecord]) -> Result[Bytes, SerializeError]
+
 // Errors
+pub(all) suberror SerializeError {
+  InvalidTag(String)
+  InvalidIndicator(String)
+  InvalidSubfieldCode(Char)
+  InvalidFieldValue(String)
+  ControlFieldTag(String)
+  FieldTooLong(String, Int)
+  DirectoryOverflow(Int)
+  RecordTooLong(Int)
+} derive(Eq, @debug.Debug)
+pub fn SerializeError::to_string(Self) -> String
+pub impl Show for SerializeError
 
 // Types and methods
 
