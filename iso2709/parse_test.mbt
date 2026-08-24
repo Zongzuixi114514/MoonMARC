@@ -147,3 +147,68 @@ test "reject invalid UTF-8 in a data field" {
     Ok(_) => fail("expected an UTF-8 error")
   }
 }
+
+///|
+fn parsed_sample() -> @record.MarcRecord {
+  parse_record(sample_record()).unwrap()
+}
+
+///|
+test "serialize a parsed record and preserve its field structure" {
+  let original = parsed_sample()
+  let raw = match serialize_record(original) {
+    Err(error) => fail(error.to_string())
+    Ok(value) => value
+  }
+  assert_eq(raw[raw.length() - 1], 0x1D)
+  match parse_record(raw) {
+    Err(error) => fail(error.to_string())
+    Ok(decoded) => {
+      assert_eq(decoded.fields(), original.fields())
+      assert_eq(decoded.leader().record_length(), Ok(raw.length()))
+      assert_eq(decoded.leader().base_address(), Ok(49))
+      assert_eq(decoded.leader().entry_map(), Ok((4, 5, 0)))
+    }
+  }
+}
+
+///|
+test "serialize a concatenated record stream" {
+  let record = parsed_sample()
+  let raw = match serialize_records([record, record]) {
+    Err(error) => fail(error.to_string())
+    Ok(value) => value
+  }
+  let results = parse_records(raw)
+  assert_eq(results.length(), 2)
+  for result in results {
+    match result {
+      Err(error) => fail(error.to_string())
+      Ok(decoded) => assert_eq(decoded.title(), Some("MoonBit 编程实践"))
+    }
+  }
+}
+
+///|
+test "reject a data field using a control tag during serialization" {
+  let leader = @leader.parse(@binary.ascii("00000nam a2200000 i 4500")).unwrap()
+  let record : @record.MarcRecord = {
+    leader,
+    fields: [
+      @record.MarcField::DataField(tag="001", indicator1=' ', indicator2=' ', subfields=[]),
+    ],
+  }
+  assert_true(serialize_record(record) is Err(ControlFieldTag("001")))
+}
+
+///|
+test "reject delimiters in serialized field content" {
+  let leader = @leader.parse(@binary.ascii("00000nam a2200000 i 4500")).unwrap()
+  let record : @record.MarcRecord = {
+    leader,
+    fields: [
+      @record.MarcField::ControlField(tag="001", value="bad\u{001E}value"),
+    ],
+  }
+  assert_true(serialize_record(record) is Err(InvalidFieldValue("001")))
+}

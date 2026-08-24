@@ -2,7 +2,7 @@
 
 MoonMARC 是一个纯 MoonBit 实现的 MARC 21 / ISO 2709 书目记录处理工具包，目标是为数字图书馆、档案馆、大学目录和数字人文项目提供可复用的底层解析能力。
 
-> 当前版本已完成 ISO 2709 解析内核、MARC 字段查询表达式、ISBN/ISSN 校验、基础书目语义校验和 CLI 集成。JSON、MARCXML、隐私脱敏、语义 Diff、统计与 Wasm 查看器将在后续阶段加入。
+> 当前版本已完成 ISO 2709 解析与序列化内核、MARC 字段查询表达式、ISBN/ISSN 校验、基础书目语义校验和 CLI 集成。JSON、MARCXML、隐私脱敏、语义 Diff、统计与 Wasm 查看器将在后续阶段加入。
 
 ## 为什么是 MARC
 
@@ -25,6 +25,8 @@ MoonMARC 不把记录解析成未经约束的字符串，而是保留 Leader、�
 - Directory：标准 MARC 21 的 `3 + 4 + 5 + 0 = 12` 字节 Entry 解析
 - 字段：控制字段 `001-009`、数据字段、两个 Indicator、`0x1F` 子字段分隔符
 - 记录流：解析单条记录和连续拼接的多记录 `.mrc` 数据
+- ISO 2709 序列化：从 `MarcRecord` 自动生成 Directory、字段长度、字段偏移、Base Address 和记录终止符
+- Round-trip：`parse → serialize → parse` 保留字段结构，序列化时拒绝非法 Tag、控制字段类型和 ISO 2709 分隔符
 - 诊断：截断记录、长度不匹配、Directory 终止符缺失、字段越界、字段终止符缺失、非法 UTF-8、畸形子字段等
 - 查询：按 Tag 查字段，支持 `245$a` 等查询表达式及常用书目字段快捷方法
 - 标识符：ISBN-10、ISBN-13 和 ISSN 校验，支持空格与连字符
@@ -48,6 +50,25 @@ for result in records {
   }
 }
 ```
+
+## ISO 2709 序列化
+
+`serialize_record` 将结构化 `MarcRecord` 写回标准 ISO 2709 二进制记录。它保留原 Leader 的业务位置，同时自动覆盖记录长度、Base Address、Indicator/Subfield 长度和 Directory Entry Map，固定生成 MARC 21 常用的 `3 + 4 + 5 + 0`（`4500`）Directory 格式。
+
+```moonbit nocheck
+///|
+let record = @moonmarc.parse_record(raw).unwrap()
+
+///|
+let encoded = @moonmarc.serialize_record(record).unwrap()
+
+// 可将多个记录合并为连续的 .mrc 数据流。
+
+///|
+let stream = @moonmarc.serialize_records([record]).unwrap()
+```
+
+序列化器会拒绝不符合记录布局的结构化数据，例如把 `001-009` 控制 Tag 写成数据字段、非 ASCII 的 Indicator 或子字段代码、超过 Directory 可表示长度的字段，以及包含 `0x1D`、`0x1E` 或 `0x1F` 保留分隔符的字段内容。
 
 常用方法包括：
 
@@ -129,6 +150,9 @@ ISO 2709 的字段长度和起始位置以 Directory 为准。MoonMARC 会先验
 - 缺失字段终止符
 - 缺失记录终止符
 - 非法 UTF-8
+- ISO 2709 序列化后的 Leader、Directory 与字段结构 Round-trip
+- 拼接多记录流的序列化与重新解析
+- 序列化时的控制字段类型与保留分隔符拒绝
 - 常用书目字段快捷查询
 - ISBN-10、ISBN-13 与 ISSN 校验
 - `245$a` 查询表达式解析
@@ -159,12 +183,11 @@ cmd/main/     CLI
 
 ## 路线图
 
-1. ISO 2709 序列化与 round-trip 测试
-2. 扩展 MARC 21 字段与子字段规则库
-3. JSON、MARCXML、CSV 转换
-4. 隐私扫描、规则驱动脱敏和审计报告
-5. 记录语义 Diff 与数据集统计
-6. 浏览器本地 Wasm 查看器
+1. 扩展 MARC 21 字段与子字段规则库
+2. JSON、MARCXML、CSV 转换
+3. 隐私扫描、规则驱动脱敏和审计报告
+4. 记录语义 Diff 与数据集统计
+5. 浏览器本地 Wasm 查看器
 
 ## 隐私说明
 
