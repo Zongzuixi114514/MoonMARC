@@ -2,7 +2,7 @@
 
 MoonMARC 是一个纯 MoonBit 实现的 MARC 21 / ISO 2709 书目记录处理工具包，目标是为数字图书馆、档案馆、大学目录和数字人文项目提供可复用的底层解析能力。
 
-> 当前版本已完成 ISO 2709 解析与序列化内核、MARC 字段查询表达式、ISBN/ISSN 校验、基础书目语义校验和 CLI 集成。JSON、MARCXML、隐私脱敏、语义 Diff、统计与 Wasm 查看器将在后续阶段加入。
+> 当前版本已完成 ISO 2709 解析与序列化内核、MARC 字段查询表达式、ISBN/ISSN 校验、基础书目语义校验、JSON 双向转换和 CLI 集成。MARCXML、隐私脱敏、语义 Diff、统计与 Wasm 查看器将在后续阶段加入。
 
 ## 为什么是 MARC
 
@@ -31,6 +31,7 @@ MoonMARC 不把记录解析成未经约束的字符串，而是保留 Leader、�
 - 查询：按 Tag 查字段，支持 `245$a` 等查询表达式及常用书目字段快捷方法
 - 标识符：ISBN-10、ISBN-13 和 ISSN 校验，支持空格与连字符
 - 语义校验：缺失题名、非法 245 指示符、无效 ISBN/ISSN 和重复控制号诊断
+- JSON：结构化记录与 JSON 文本双向转换，支持单条记录和多记录数组
 - CLI：`inspect`、`validate`、`show`、`query`，其中 `validate` 同时执行结构与语义校验
 
 ## MoonBit API
@@ -85,6 +86,40 @@ record.subjects()
 record.summary()
 record.isbn_list()
 ```
+
+## JSON 转换
+
+MoonMARC 已提供 MARC 21 结构化记录与 JSON 之间的双向转换。JSON 设计保留 Leader、字段顺序、重复字段、Indicator 和子字段顺序，适合与 Web API、数据分析脚本和其他目录系统交换。
+
+单条记录的 JSON 形状如下：
+
+```json
+{
+  "leader": "00000nam a2200000 i 4500",
+  "fields": [
+    { "tag": "001", "value": "book-0001" },
+    {
+      "tag": "245",
+      "indicators": ["1", "0"],
+      "subfields": [
+        { "code": "a", "value": "MoonBit 编程实践" },
+        { "code": "c", "value": "示例作者" }
+      ]
+    }
+  ]
+}
+```
+
+控制字段使用 `value`，数据字段使用 `indicators` 和 `subfields`。多条记录使用 JSON 数组；导入时会检查 Leader、Tag、Indicator、子字段代码和字段类型，错误会返回结构化 `JsonConversionError`。
+
+```moonbit nocheck
+let json_text = @moonmarc.record_to_json_text(record, indent=2)
+let record = @moonmarc.record_from_json_text(json_text).unwrap()
+let records_text = @moonmarc.records_to_json_text([record])
+let records = @moonmarc.records_from_json_text(records_text).unwrap()
+```
+
+JSON 转换可以直接衔接 ISO 2709：`JSON text → MarcRecord → serialize_record → .mrc`。序列化阶段会重新计算记录长度、Directory 和 Base Address，因此输出记录的 Leader 长度字段以实际二进制记录为准。
 
 ## CLI
 
@@ -152,6 +187,7 @@ ISO 2709 的字段长度和起始位置以 Directory 为准。MoonMARC 会先验
 - ISBN-10、ISBN-13 与 ISSN 校验
 - `245$a` 查询表达式解析
 - 题名、指示符、标识符和重复控制号语义校验
+- JSON 单条/多条记录转换及 JSON → ISO 2709 集成 Round-trip
 
 验证命令：
 
@@ -170,6 +206,7 @@ leader/       MARC 21 Leader
  directory/   ISO 2709 Directory
 record/       记录、字段、子字段和高层查询
 iso2709/      单记录和多记录解析
+formats/marcjson/ JSON 双向转换
 identifiers/  ISBN 与 ISSN 校验
 query/        MARC 子字段查询表达式
 validation/   书目语义校验和诊断
@@ -179,7 +216,7 @@ cmd/main/     CLI
 ## 路线图
 
 1. 扩展 MARC 21 字段与子字段规则库
-2. JSON、MARCXML、CSV 转换
+2. MARCXML、CSV 等更多格式转换
 3. 隐私扫描、规则驱动脱敏和审计报告
 4. 记录语义 Diff 与数据集统计
 5. 浏览器本地 Wasm 查看器

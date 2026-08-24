@@ -1,0 +1,6 @@
+import {
+  "moonbitlang/core/json",
+  "Zongzuixi114514/moonmarc/binary",
+  "Zongzuixi114514/moonmarc/leader",
+  "Zongzuixi114514/moonmarc/record",
+}

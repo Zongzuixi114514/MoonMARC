@@ -2,6 +2,7 @@
 package "Zongzuixi114514/moonmarc"
 
 import {
+  "Zongzuixi114514/moonmarc/formats/marcjson",
   "Zongzuixi114514/moonmarc/iso2709",
   "Zongzuixi114514/moonmarc/record",
 }
@@ -10,6 +11,22 @@ import {
 pub fn parse_record(Bytes) -> Result[@record.MarcRecord, @record.RecordError]
 
 pub fn parse_records(Bytes) -> Array[Result[@record.MarcRecord, @record.RecordError]]
+
+pub fn record_from_json(Json) -> Result[@record.MarcRecord, @marcjson.JsonConversionError]
+
+pub fn record_from_json_text(String) -> Result[@record.MarcRecord, @marcjson.JsonConversionError]
+
+pub fn record_to_json(@record.MarcRecord) -> Json
+
+pub fn record_to_json_text(@record.MarcRecord, indent? : Int) -> String
+
+pub fn records_from_json(Json) -> Result[Array[@record.MarcRecord], @marcjson.JsonConversionError]
+
+pub fn records_from_json_text(String) -> Result[Array[@record.MarcRecord], @marcjson.JsonConversionError]
+
+pub fn records_to_json(Array[@record.MarcRecord]) -> Json
+
+pub fn records_to_json_text(Array[@record.MarcRecord], indent? : Int) -> String
 
 pub fn serialize_record(@record.MarcRecord) -> Result[Bytes, @iso2709.SerializeError]
 

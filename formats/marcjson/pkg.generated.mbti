@@ -1,0 +1,43 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "Zongzuixi114514/moonmarc/formats/marcjson"
+
+import {
+  "Zongzuixi114514/moonmarc/record",
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn record_from_json(Json) -> Result[@record.MarcRecord, JsonConversionError]
+
+pub fn record_from_json_text(String) -> Result[@record.MarcRecord, JsonConversionError]
+
+pub fn record_to_json(@record.MarcRecord) -> Json
+
+pub fn record_to_json_text(@record.MarcRecord, indent? : Int) -> String
+
+pub fn records_from_json(Json) -> Result[Array[@record.MarcRecord], JsonConversionError]
+
+pub fn records_from_json_text(String) -> Result[Array[@record.MarcRecord], JsonConversionError]
+
+pub fn records_to_json(Array[@record.MarcRecord]) -> Json
+
+pub fn records_to_json_text(Array[@record.MarcRecord], indent? : Int) -> String
+
+// Errors
+pub(all) suberror JsonConversionError {
+  InvalidJson(String)
+  MissingField(String)
+  WrongType(String)
+  InvalidValue(String)
+  InvalidLeader(String)
+  InvalidTag(String)
+} derive(Eq, @debug.Debug)
+pub fn JsonConversionError::to_string(Self) -> String
+pub impl Show for JsonConversionError
+
+// Types and methods
+
+// Type aliases
+
+// Traits
+
