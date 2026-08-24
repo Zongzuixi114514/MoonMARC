@@ -96,3 +96,57 @@ pub fn records_from_json_text(
 ) -> Result[Array[@record.MarcRecord], @marcjson.JsonConversionError] {
   @marcjson.records_from_json_text(text)
 }
+
+///|
+/// Convert one MARC 21 record to MARCXML.
+pub fn record_to_xml(record : @record.MarcRecord) -> String {
+  @marcxml.record_to_xml(record)
+}
+
+///|
+/// Convert multiple MARC 21 records to a MARCXML collection.
+pub fn records_to_xml(records : Array[@record.MarcRecord]) -> String {
+  @marcxml.records_to_xml(records)
+}
+
+///|
+/// Parse one MARCXML record.
+pub fn record_from_xml(
+  text : String,
+) -> Result[@record.MarcRecord, @marcxml.MarcXmlError] {
+  @marcxml.record_from_xml(text)
+}
+
+///|
+/// Parse a MARCXML record or collection.
+pub fn records_from_xml(
+  text : String,
+) -> Result[Array[@record.MarcRecord], @marcxml.MarcXmlError] {
+  @marcxml.records_from_xml(text)
+}
+
+///|
+/// Scan records for common privacy-sensitive values.
+pub fn privacy_scan(
+  records : Array[@record.MarcRecord],
+) -> @privacy.PrivacyReport {
+  @privacy.scan(records)
+}
+
+///|
+/// Redact local fields and/or mask email-like values.
+pub fn redact_records(
+  records : Array[@record.MarcRecord],
+  drop_9xx? : Bool,
+  mask_email? : Bool,
+) -> Array[@record.MarcRecord] {
+  @privacy.redact(records, drop_9xx?, mask_email?)
+}
+
+///|
+/// Calculate dataset coverage and field frequency statistics.
+pub fn dataset_stats(
+  results : Array[Result[@record.MarcRecord, @record.RecordError]],
+) -> @stats.DatasetStats {
+  @stats.analyze(results)
+}

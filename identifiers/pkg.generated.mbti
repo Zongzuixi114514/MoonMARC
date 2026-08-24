@@ -17,4 +17,3 @@ pub fn is_valid_issn(String) -> Bool
 // Type aliases
 
 // Traits
-

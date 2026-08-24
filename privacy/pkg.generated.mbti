@@ -1,0 +1,27 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "Zongzuixi114514/moonmarc/privacy"
+
+import {
+  "Zongzuixi114514/moonmarc/record",
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn redact(Array[@record.MarcRecord], drop_9xx? : Bool, mask_email? : Bool) -> Array[@record.MarcRecord]
+
+pub fn scan(Array[@record.MarcRecord]) -> PrivacyReport
+
+// Errors
+
+// Types and methods
+pub(all) struct PrivacyReport {
+  records : Int
+  local_fields : Int
+  email_values : Int
+  phone_values : Int
+  manual_review_required : Bool
+} derive(Eq, @debug.Debug)
+
+// Type aliases
+
+// Traits

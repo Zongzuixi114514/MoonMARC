@@ -2,7 +2,7 @@
 
 MoonMARC 是一个纯 MoonBit 实现的 MARC 21 / ISO 2709 书目记录处理工具包，目标是为数字图书馆、档案馆、大学目录和数字人文项目提供可复用的底层解析能力。
 
-> 当前版本已完成 ISO 2709 解析与序列化内核、MARC 字段查询表达式、ISBN/ISSN 校验、基础书目语义校验、JSON 双向转换和 CLI 集成。MARCXML、隐私脱敏、语义 Diff、统计与 Wasm 查看器将在后续阶段加入。
+> 当前版本已完成 ISO 2709 解析与序列化内核、MARC 字段查询表达式、ISBN/ISSN 校验、基础书目语义校验、JSON/MARCXML 双向转换、隐私扫描与最小脱敏、数据统计和 CLI 集成。Wasm 查看器和更完整的 MARC 21 语义规则仍属于后续增强。
 
 ## 为什么是 MARC
 
@@ -132,7 +132,24 @@ let records = @moonmarc.records_from_json_text(records_text).unwrap()
 ```
 
 JSON 转换可以直接衔接 ISO 2709：`JSON text → MarcRecord → serialize_record → .mrc`。序列化阶段会重新计算记录长度、Directory 和 Base Address，因此输出记录的 Leader 长度字段以实际二进制记录为准。
-## CLI
+## MARCXML 转换
+
+MoonMARC 支持标准 MARCXML 核心 `record`/`collection` 结构的轻量级双向转换，保留 Leader、控制字段、数据字段、Indicator 和子字段顺序，并正确转义 XML 特殊字符。它不是完整 XML 标准解析器，不承诺处理任意扩展命名空间、复杂混合内容或全部 MARCXML 语义约束。
+
+```moonbit nocheck
+///|
+let xml = @moonmarc.record_to_xml(record)
+
+///|
+let record = @moonmarc.record_from_xml(xml).unwrap()
+
+///|
+let collection = @moonmarc.records_to_xml([record])
+
+///|
+let records = @moonmarc.records_from_xml(collection).unwrap()
+```
+
 
 使用 MoonBit 工具链运行：
 
@@ -143,11 +160,22 @@ moon run cmd/main -- inspect books.mrc
 # 输出有效/错误数量和诊断
 moon run cmd/main -- validate books.mrc
 
-# 查看第 1 条记录（记录序号从 1 开始）
-moon run cmd/main -- show books.mrc 1
+# 查看第 1 条记录（支持位置参数或 --record 形式）
+moon run cmd/main -- show books.mrc --record 1
 
 # 查询每条记录的 245$a
 moon run cmd/main -- query books.mrc '245$a'
+
+# 三格式转换
+moon run cmd/main -- convert books.mrc --format json --pretty
+moon run cmd/main -- convert books.json --format mrc --output books.mrc
+moon run cmd/main -- convert books.mrc --format marcxml --output books.xml
+moon run cmd/main -- convert books.xml --format mrc --output books-from-xml.mrc
+
+# 隐私扫描、脱敏和数据统计
+moon run cmd/main -- privacy books.mrc
+moon run cmd/main -- redact books.mrc --drop-9xx --mask-email --output public.mrc
+moon run cmd/main -- stats books.mrc
 ```
 
 CLI 在本地读取文件，解析失败时输出可读诊断。库本身不依赖文件系统，因此可以被浏览器 Wasm 或其他 MoonBit 程序复用。
@@ -199,6 +227,10 @@ ISO 2709 的字段长度和起始位置以 Directory 为准。MoonMARC 会先验
 - `245$a` 查询表达式解析
 - 题名、指示符、标识符和重复控制号语义校验
 - JSON 单条/多条记录转换及 JSON → ISO 2709 集成 Round-trip
+- MARCXML 单条/多条记录转换及 MARCXML → ISO 2709 集成 Round-trip
+- XML 特殊字符转义与畸形 MARCXML 诊断
+- 隐私扫描、9XX 字段删除和邮箱掩码
+- 数据集有效/错误计数、字段频率和题名/作者/ISBN 覆盖率
 
 验证命令：
 
@@ -218,10 +250,15 @@ leader/       MARC 21 Leader
 record/       记录、字段、子字段和高层查询
 iso2709/      单记录和多记录解析
 formats/marcjson/ JSON 双向转换
+formats/marcxml/ JSON/MARCXML 核心转换
+privacy/      隐私扫描与最小脱敏
+stats/        数据集统计
 identifiers/  ISBN 与 ISSN 校验
 query/        MARC 子字段查询表达式
 validation/   书目语义校验和诊断
 cmd/main/     CLI
+fixtures/     验收用有效和畸形数据
+scripts/      自动化验收脚本
 ```
 
 ## 路线图
@@ -234,9 +271,20 @@ cmd/main/     CLI
 
 ## 隐私说明
 
-MARC 数据可能包含采购备注、馆藏位置、本地 9XX 字段、内部 URL、电子邮箱、电话号码或其他个人信息。未来的隐私扫描和脱敏功能只能作为辅助工具使用：
+MARC 数据可能包含采购备注、馆藏位置、本地 9XX 字段、内部 URL、电子邮箱、电话号码或其他个人信息。隐私扫描只识别有限的邮箱、电话号码样式和 9XX 字段；脱敏只执行明确请求的字段删除与邮箱掩码。
 
-> MoonMARC 只能提供技术层面的辅助检测，不能保证识别全部个人信息，正式公开数据前仍需人工审核。
+> MoonMARC 的隐私扫描只能提供技术辅助，不能保证识别全部个人信息。公开数据前仍需人工审核。
+
+## 验收
+
+仓库提供可复制的验收说明和脚本：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/acceptance.ps1
+```
+
+脚本会执行格式检查、全目标类型检查、测试、CLI 诊断、查询、三格式转换和隐私/统计命令。适合正式验收的输入位于 `fixtures/`，MARCXML 转换边界见 `docs/format-notes.md`。
+
 
 ## 许可证
 

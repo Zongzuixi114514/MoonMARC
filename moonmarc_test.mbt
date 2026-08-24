@@ -30,24 +30,39 @@ test "round-trip JSON through ISO 2709 serialization" {
 }
 
 ///|
-test "round-trip a JSON record array through an ISO 2709 stream" {
+test "round-trip a MARC record through MARCXML and ISO 2709" {
   let original = record_from_json_text(sample_json_record_text()).unwrap()
-  let json_text = records_to_json_text([original, original])
-  let records = match records_from_json_text(json_text) {
+  let xml = record_to_xml(original)
+  let from_xml = match record_from_xml(xml) {
     Err(error) => fail(error.to_string())
-    Ok(value) => value
+    Ok(record) => record
   }
-  assert_eq(records, [original, original])
-  let encoded = match serialize_records(records) {
+  assert_eq(from_xml, original)
+  let encoded = match serialize_record(from_xml) {
     Err(error) => fail(error.to_string())
     Ok(bytes) => bytes
   }
-  let decoded = parse_records(encoded)
-  assert_eq(decoded.length(), 2)
-  for result in decoded {
-    match result {
-      Err(error) => fail(error.to_string())
-      Ok(record) => assert_eq(record.control_number(), Some("book-001"))
+  match parse_record(encoded) {
+    Err(error) => fail(error.to_string())
+    Ok(decoded) => {
+      assert_eq(decoded.fields(), original.fields())
+      assert_eq(decoded.leader().status(), original.leader().status())
+      assert_eq(decoded.leader().record_type(), original.leader().record_type())
+      assert_eq(
+        decoded.leader().bibliographic_level(),
+        original.leader().bibliographic_level(),
+      )
+      assert_eq(decoded.leader().entry_map(), Ok((4, 5, 0)))
     }
+  }
+}
+
+///|
+test "round-trip a MARC record collection through MARCXML" {
+  let original = record_from_json_text(sample_json_record_text()).unwrap()
+  let xml = records_to_xml([original, original])
+  match records_from_xml(xml) {
+    Err(error) => fail(error.to_string())
+    Ok(records) => assert_eq(records, [original, original])
   }
 }

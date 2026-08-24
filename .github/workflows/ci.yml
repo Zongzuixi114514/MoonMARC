@@ -1,0 +1,19 @@
+name: MoonMARC CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install MoonBit
+        uses: moonbitlang/setup-moonbit@v1
+      - name: Check formatting
+        run: moon fmt --check
+      - name: Check all targets
+        run: moon check --target all
+      - name: Run tests
+        run: moon test

@@ -1,0 +1,32 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "Zongzuixi114514/moonmarc/stats"
+
+import {
+  "Zongzuixi114514/moonmarc/record",
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn analyze(Array[Result[@record.MarcRecord, @record.RecordError]]) -> DatasetStats
+
+// Errors
+
+// Types and methods
+pub(all) struct DatasetStats {
+  records : Int
+  valid : Int
+  errors : Int
+  title_coverage : Int
+  author_coverage : Int
+  isbn_coverage : Int
+  field_counts : Array[FieldCount]
+} derive(Eq, @debug.Debug)
+
+pub(all) struct FieldCount {
+  tag : String
+  count : Int
+} derive(Eq, @debug.Debug)
+
+// Type aliases
+
+// Traits

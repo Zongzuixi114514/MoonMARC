@@ -1,0 +1,8 @@
+import {
+  "Zongzuixi114514/moonmarc/record",
+}
+
+import {
+  "Zongzuixi114514/moonmarc/binary",
+  "Zongzuixi114514/moonmarc/leader",
+} for "test"

@@ -31,4 +31,3 @@ pub fn Query::evaluate(Self, @record.MarcRecord) -> Array[String]
 // Type aliases
 
 // Traits
-

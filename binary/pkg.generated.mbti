@@ -43,4 +43,3 @@ pub fn Reader::seek(Self, Int) -> Result[Unit, ReadError]
 // Type aliases
 
 // Traits
-

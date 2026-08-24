@@ -41,4 +41,3 @@ pub fn Leader::type_of_control(Self) -> Char
 // Type aliases
 
 // Traits
-

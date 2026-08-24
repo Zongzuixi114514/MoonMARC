@@ -2,9 +2,13 @@ import {
   "moonbitlang/core/env",
   "moonbitlang/core/string",
   "moonbitlang/x/fs",
+  "Zongzuixi114514/moonmarc/formats/marcjson",
+  "Zongzuixi114514/moonmarc/formats/marcxml",
   "Zongzuixi114514/moonmarc/iso2709",
+  "Zongzuixi114514/moonmarc/privacy",
   "Zongzuixi114514/moonmarc/query",
   "Zongzuixi114514/moonmarc/record",
+  "Zongzuixi114514/moonmarc/stats",
   "Zongzuixi114514/moonmarc/validation",
 }
 

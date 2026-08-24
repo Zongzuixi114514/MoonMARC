@@ -1,0 +1,22 @@
+{
+  "leader": "00084nam a2200049 i 4500",
+  "fields": [
+    {
+      "tag": "001",
+      "value": "book-001"
+    },
+    {
+      "tag": "245",
+      "indicators": [
+        "1",
+        "0"
+      ],
+      "subfields": [
+        {
+          "code": "a",
+          "value": "MoonBit 编程实践"
+        }
+      ]
+    }
+  ]
+}

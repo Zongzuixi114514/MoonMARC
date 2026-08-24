@@ -1,0 +1,34 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "Zongzuixi114514/moonmarc/formats/marcxml"
+
+import {
+  "Zongzuixi114514/moonmarc/record",
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn record_from_xml(String) -> Result[@record.MarcRecord, MarcXmlError]
+
+pub fn record_to_xml(@record.MarcRecord) -> String
+
+pub fn records_from_xml(String) -> Result[Array[@record.MarcRecord], MarcXmlError]
+
+pub fn records_to_xml(Array[@record.MarcRecord]) -> String
+
+// Errors
+pub(all) suberror MarcXmlError {
+  InvalidDocument(String)
+  MissingElement(String)
+  InvalidAttribute(String)
+  InvalidLeader(String)
+  InvalidTag(String)
+  InvalidSubfield(String)
+} derive(Eq, @debug.Debug)
+pub fn MarcXmlError::to_string(Self) -> String
+pub impl Show for MarcXmlError
+
+// Types and methods
+
+// Type aliases
+
+// Traits
